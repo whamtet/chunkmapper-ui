@@ -21,6 +21,7 @@
 
 (intercept/set-responses!
   (ctmx/metas main))
+
 (main)
 
 (set! js/htmx.config.defaultSettleDelay 0)
