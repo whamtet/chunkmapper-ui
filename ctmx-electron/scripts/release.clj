@@ -7,8 +7,5 @@
            {:output-to "../ctmx_electron.js"
             :output-dir "release"
             :optimizations :simple
-            :verbose true
-            :foreign-libs [{:file "htmx.js"
-                            :provides ["htmx"]
-                            :module-type :commonjs}]})
+            :target :nodejs})
   (println "... done. Elapsed" (/ (- (System/nanoTime) start) 1e9) "seconds"))
