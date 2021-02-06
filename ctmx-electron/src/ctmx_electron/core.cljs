@@ -10,13 +10,13 @@
 
 (enable-console-print!)
 
-(println "MyActivity Hello world!")
+(def default-req {:params {}})
 
 (ctmx/defstatic main []
   (let [content (js/document.getElementById "content")]
     (set! (.-innerHTML content)
           (hiccups/html
-            (ui/panel nil)))
+            (ui/panel default-req)))
     (js/htmx.process content)))
 
 (intercept/set-responses!
