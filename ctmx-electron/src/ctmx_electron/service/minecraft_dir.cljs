@@ -1,6 +1,7 @@
 (ns ctmx-electron.service.minecraft-dir
   (:require
     [clojure.string :as string]
+    [ctmx-electron.service.storage :as storage]
     [ctmx-electron.util :as util])
   (:require-macros
     [ctmx-electron.util :refer [requires]]))
@@ -9,15 +10,24 @@
 
 (def home-dir (.homedir os))
 
-(def dir
+(def default-dir
   (str home-dir
        (cond
          util/osx? "/Library/Application Support/minecraft"
          util/windows? "/AppData/.minecraft"
          util/linux? "/.minecraft")))
 
+(defn dir []
+  (if (.existsSync fs default-dir)
+    default-dir
+    (storage/get-minecraft-dir)))
+
 (defn exists? []
-  (.existsSync fs dir))
+  (or
+    (.existsSync fs default-dir)
+    (if-let [dir (storage/get-minecraft-dir)]
+      (.existsSync fs dir)
+      false)))
 
 (defn update-dir! [elt]
   (as-> elt $
@@ -27,6 +37,11 @@
         (.split $ "/")
         (butlast $)
         (string/join "/" $)
-        (set! dir $)))
+        (storage/set-minecraft-dir $)))
 
+(defn saves []
+  (as-> (str (dir) "/saves") $
+        (.readdirSync fs $ #js {:withFileTypes true})
+        (filter #(.isDirectory %) $)
+        (map #(.-name %) $)))
 
