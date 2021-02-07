@@ -14,7 +14,7 @@
      [:div.modal-dialog.modal-dialog-centered
       [:div.modal-content
        [:div.modal-header
-        [:h5.modal-title "New Map"]]
+        [:h5.modal-title "New Chunkmap"]]
        [:form.modal-body {:hx-post "chunkmaps"}
         [:label.mr-2 "Game Name"]
         [:input {:type "text" :name "new-game" :required true}][:br]
@@ -33,11 +33,11 @@
         (process/new-game new-game))
       [:div.p-2 {:id id :hx-target "this" :style "border: 1px solid black"}
        [:h4 "Chunkmaps"]
-       [:p msg]
-       [:button#modal-btn.d-none
+       [:p msg
+        " Click " [:button.leaflet-control-geocoder-icon {:type "button"} " "] " to find a place."]
+       [:div#modal-btn.d-none
         {:_ "on htmx:afterOnLoad wait 10ms then add .show to #modal then add .show to #modal-backdrop"
-         :hx-patch "chunkmaps"}
-        "New Map"]
+         :hx-patch "chunkmaps"}]
        (when (and top-level? patch?)
          modal)
        (for [save saves]
