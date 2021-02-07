@@ -76,4 +76,7 @@
                       :hx-target (hash ".")}]]
             [:div
              "Or install Minecraft and restart Chunkmapper."]])]]]
-      (js/alert "Java required.  Please install Java and restart Chunkmapper."))))
+      (do
+        (js/alert "Java required.  Please install Java and restart Chunkmapper.")
+        [:h3.text-center.my-5
+         "Java required.  Please install Java and restart Chunkmapper."]))))
