@@ -12,10 +12,12 @@
     .-status
     zero?))
 
-(defn on-logback [{:keys [evt lat lng]}]
+(defn on-logback [{:keys [evt lat lng lat1 lng1 lat2 lng2]}]
   (case evt
     "steve"
     (js/recenter lat lng)
+    "region"
+    (js/addRegion #js [lat1 lng1] #js [lat2 lng2])
     nil))
 
 (defn new-game [game]

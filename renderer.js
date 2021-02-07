@@ -29,3 +29,7 @@ const recenter = (lat, lng) => {
     steve = L.marker([lat, lng], {icon: steveIcon}).addTo(map);
   }
 };
+
+const addRegion = (p1, p2) => {
+  L.rectangle([p1, p2], {color: 'blue', weight: 0.5}).addTo(map);
+};
