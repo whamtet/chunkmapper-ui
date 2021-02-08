@@ -29,6 +29,17 @@ const setSteve = (lat, lng) => {
   }
 };
 
+var regions = [];
 const addRegion = (p1, p2) => {
-  L.rectangle([p1, p2], {color: 'blue', weight: 0.5}).addTo(map);
+  const region = L.rectangle([p1, p2], {color: 'blue', weight: 0.5});
+  regions.push(region);
+  region.addTo(map);
+};
+
+const clear = () => {
+  regions.map(r => r.remove());
+  regions = [];
+  steve.remove();
+  steve = undefined;
+  added = false;
 };

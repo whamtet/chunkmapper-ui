@@ -23,43 +23,53 @@
          {:hx-get "chunkmaps"}
          "Cancel"]]]]]))
 
-(ctmx/defcomponent ^:endpoint chunkmaps [req new-game]
+(ctmx/defcomponent ^:endpoint chunkmaps [req new-game save]
   (ctmx/with-req req
+    (when delete?
+      (if save
+        (minecraft-dir/delete! save)
+        (do
+          (process/kill!)
+          (js/clear))))
     (let [saves (minecraft-dir/saves)
           msg (if (empty? saves)
                 "Double click map to create a new chunkmap."
                 "Double click map to create a new chunkmap, or select one of the existing maps below.")]
-      (when (and post? top-level?)
-        (process/new-game new-game))
-      [:div.p-2 {:id id :hx-target "this" :style "border: 1px solid black"}
-       [:h4 "Chunkmaps"]
-       [:p msg
-        " Click " [:button.leaflet-control-geocoder-icon {:type "button"} " "] " to find a place."]
-       [:div#modal-btn.d-none
-        {:_ "on htmx:afterOnLoad wait 10ms then add .show to #modal then add .show to #modal-backdrop"
-         :hx-patch "chunkmaps"}]
-       (when (and top-level? patch?)
-         modal)
-       (for [save saves]
-         [:div.row
-          [:div.col-2
-           [:a {:hx-patch "panel"
-                :href "javascript:void(0)"
-                :hx-vals (util/json {:save save})} save]]
-          [:div.col-1
-           [:a {:hx-delete "panel"
-                :href "javascript:void(0)"
-                :hx-vals (util/json {:save save})
-                :hx-target (hash "..")
-                :hx-confirm (str "Delete " save "?")}
-            "Delete"]]])])))
+      (if (and post? top-level?)
+        (do
+          (if new-game
+            (process/new-game new-game)
+            (println "resuming" save))
+          [:h2.text-center {:id id :hx-target "this"}
+           "Building " (or save new-game) "..."
+           [:button.btn.btn-primary.ml-2
+            {:hx-delete "chunkmaps"} "Cancel"]])
+        [:div.p-2 {:id id :hx-target "this" :style "border: 1px solid black"}
+         [:h4 "Chunkmaps"]
+         [:p msg
+          " Click " [:button.leaflet-control-geocoder-icon {:type "button"} " "] " to find a place."]
+         [:div#modal-btn.d-none
+          {:_ "on htmx:afterOnLoad wait 10ms then add .show to #modal then add .show to #modal-backdrop"
+           :hx-patch "chunkmaps"}]
+         (when (and patch? top-level?)
+           modal)
+         (for [save saves]
+           [:div.row
+            [:div.col-2
+             [:a {:hx-post "chunkmaps"
+                  :href "javascript:void(0)"
+                  :hx-vals (util/json {:save save})} save]]
+            [:div.col-1
+             [:a {:hx-delete "chunkmaps"
+                  :href "javascript:void(0)"
+                  :hx-vals (util/json {:save save})
+                  :hx-confirm (str "Delete " save "?")}
+              "Delete"]]])]))))
 
-(ctmx/defcomponent ^:endpoint panel [req save]
+(ctmx/defcomponent ^:endpoint panel [req]
   (ctmx/with-req req
     (when post?
       (-> req :elt minecraft-dir/update-dir!))
-    (when delete?
-      (minecraft-dir/delete! save))
     (cond
       (process/java?)
       [:div.my-2 {:id id :hx-ext "intercept" :hx-target "this"}

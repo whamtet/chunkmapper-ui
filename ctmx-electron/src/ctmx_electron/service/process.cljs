@@ -36,6 +36,12 @@
                        "name" game
                        "lat" lat
                        "lng" lng]))
+    (set! js/window.p process)
     (doto process
       (-> .-stdout (.on "data" log))
       (-> .-stderr (.on "data" #(-> % str js/console.error))))))
+
+(defn kill! []
+  (when process
+    (.kill process)
+    (set! process nil)))
