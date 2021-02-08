@@ -27,7 +27,7 @@
   (ctmx/with-req req
     (let [saves (minecraft-dir/saves)
           msg (if (empty? saves)
-                "Double click map to create a new chunkmap"
+                "Double click map to create a new chunkmap."
                 "Double click map to create a new chunkmap, or select one of the existing maps below.")]
       (when (and post? top-level?)
         (process/new-game new-game))
@@ -50,16 +50,18 @@
            [:a {:hx-delete "panel"
                 :href "javascript:void(0)"
                 :hx-vals (util/json {:save save})
+                :hx-target (hash "..")
                 :hx-confirm (str "Delete " save "?")}
             "Delete"]]])])))
 
-(ctmx/defcomponent ^:endpoint panel [req]
+(ctmx/defcomponent ^:endpoint panel [req save]
   (ctmx/with-req req
     (when post?
       (-> req :elt minecraft-dir/update-dir!))
-    (when patch?
-      (-> req :params :save prn))
-    (if (process/java?)
+    (when delete?
+      (minecraft-dir/delete! save))
+    (cond
+      (process/java?)
       [:div.my-2 {:id id :hx-ext "intercept" :hx-target "this"}
        [:div.row
         [:div.col-1]
@@ -76,6 +78,7 @@
                       :hx-target (hash ".")}]]
             [:div
              "Or install Minecraft and restart Chunkmapper."]])]]]
+      :else
       (do
         (js/alert "Java required.  Please install Java and restart Chunkmapper.")
         [:h3.text-center.my-5

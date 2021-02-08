@@ -45,3 +45,8 @@
         (filter #(.isDirectory %) $)
         (map #(.-name %) $)))
 
+(defn delete! [name]
+  (.rmdirSync fs
+    (str (dir) "/saves/" name)
+    #js {:recursive true}))
+

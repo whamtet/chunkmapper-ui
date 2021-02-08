@@ -10,14 +10,13 @@ L.Control.geocoder().addTo(map);
 var newLocation;
 map.on('dblclick', e => {
   newLocation = e.latlng;
-//   document.getElementById('modal-btn').click();
+  document.getElementById('modal-btn').click();
 //   ctmx_electron.service.process.new_game('my-game');
 });
 
 var steve;
 var added = false;
-const recenter = (lat, lng) => {
-  map.flyTo([lat, lng]);
+const setSteve = (lat, lng) => {
   if (added) {
     steve.remove();
     steve.setLatLng([lat, lng]);
