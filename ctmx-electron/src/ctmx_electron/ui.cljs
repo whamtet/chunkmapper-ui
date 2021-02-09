@@ -1,6 +1,7 @@
 (ns ctmx-electron.ui
   (:require
     ctmx.rt
+    [ctmx-electron.service.map :as map]
     [ctmx-electron.service.process :as process]
     [ctmx-electron.service.minecraft-dir :as minecraft-dir]
     [ctmx-electron.util :as util])
@@ -30,14 +31,14 @@
         (minecraft-dir/delete! save)
         (do
           (process/kill!)
-          (js/clear))))
+          (map/clear))))
     (let [saves (minecraft-dir/saves)
           msg (if (empty? saves)
                 "Double click map to create a new chunkmap."
                 "Double click map to create a new chunkmap, or select one of the existing maps below.")]
       (if (and post? top-level?)
         (do
-          (process/new-game (or new-game save))
+          (process/new-game new-game)
           [:h2.text-center {:id id :hx-target "this"}
            "Building " (or save new-game) "..."
            [:button.btn.btn-primary.ml-2

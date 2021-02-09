@@ -1,5 +1,6 @@
 (ns ctmx-electron.service.process
   (:require
+    [ctmx-electron.service.map :as map]
     [ctmx-electron.util :as util])
   (:require-macros
     [ctmx-electron.util :refer [requires]]))
@@ -17,7 +18,7 @@
     "steve"
     (js/setSteve lat lng)
     "region"
-    (js/addRegion #js [lat1 lng1] #js [lat2 lng2])
+    (map/blue-region [lat1 lng1] [lat2 lng2])
     nil))
 
 (defn- logback-json [s]
@@ -40,10 +41,13 @@
     (set! process
           (.spawn child_process
                   "java"
-                  #js ["-jar" "chunkmapper-0.2.jar"
-                       "name" game
-                       "lat" lat
-                       "lng" lng]))
+                  (clj->js
+                    (concat
+                      ["-jar" "chunkmapper-0.2.jar"]
+                      (when game
+                        ["name" game
+                         "lat" lat
+                         "lng" lng])))))
     (set! js/window.p process)
     (doto process
       (-> .-stdout (.on "data" log))
