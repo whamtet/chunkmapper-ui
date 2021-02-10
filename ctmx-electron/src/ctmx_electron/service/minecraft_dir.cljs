@@ -39,8 +39,11 @@
         (string/join "/" $)
         (storage/set-minecraft-dir $)))
 
+(defn game-dir [f]
+  (str (dir) "/saves/" f))
+
 (defn chunkmapper? [f]
-  (.existsSync fs (str (dir) "/saves/" f "/chunkmapper")))
+  (.existsSync fs (str (game-dir f) "/chunkmapper")))
 
 (defn saves []
   (as-> (str (dir) "/saves") $
@@ -51,6 +54,6 @@
 
 (defn delete! [name]
   (.rmdirSync fs
-              (str (dir) "/saves/" name)
+              (game-dir name)
               #js {:recursive true}))
 

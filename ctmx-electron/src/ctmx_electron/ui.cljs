@@ -38,7 +38,7 @@
                 "Double click map to create a new chunkmap, or select one of the existing maps below.")]
       (if (and post? top-level?)
         (do
-          (process/new-game new-game)
+          (process/new-game (or new-game save))
           [:h2.text-center {:id id :hx-target "this"}
            "Building " (or save new-game) "..."
            [:button.btn.btn-primary.ml-2

@@ -1,5 +1,6 @@
 (ns ctmx-electron.service.process
   (:require
+    [ctmx-electron.service.minecraft-dir :as minecraft-dir]
     [ctmx-electron.service.map :as map]
     [ctmx-electron.util :as util])
   (:require-macros
@@ -17,7 +18,11 @@
   (case evt
     "steve"
     (js/setSteve lat lng)
-    "region"
+    "goto"
+    (js/map.flyTo #js [lat1 lng1])
+    "region1"
+    (map/red-region [lat1 lng1] [lat2 lng2])
+    "region2"
     (map/blue-region [lat1 lng1] [lat2 lng2])
     nil))
 
@@ -43,10 +48,10 @@
                   "java"
                   (clj->js
                     (concat
-                      ["-jar" "chunkmapper-0.2.jar"]
-                      (when game
-                        ["name" game
-                         "lat" lat
+                      ["-jar" "chunkmapper-0.2.jar"
+                       "name" (minecraft-dir/game-dir game)]
+                      (when lat
+                        ["lat" lat
                          "lng" lng])))))
     (set! js/window.p process)
     (doto process

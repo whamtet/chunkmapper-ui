@@ -4,12 +4,12 @@
 (def blue-regions (atom ()))
 
 (defn red-region [p1 p2]
-  (let [region (js/L.rectangle #js [p1 p2] #js {:color "red" :weight 0.5})]
+  (let [region (js/L.rectangle (clj->js [p1 p2]) #js {:color "red" :weight 0.5})]
     (.addTo region js/map)
     (swap! red-regions assoc [p1 p2] region)))
 
 (defn blue-region [p1 p2]
-  (let [region (js/L.rectangle #js [p1 p2] #js {:color "blue" :weight 0.5})]
+  (let [region (js/L.rectangle (clj->js [p1 p2]) #js {:color "blue" :weight 0.5})]
     (when-let [red-region (@red-regions [p1 p2])]
       (.remove red-region)
       (swap! red-regions dissoc [p1 p2]))
