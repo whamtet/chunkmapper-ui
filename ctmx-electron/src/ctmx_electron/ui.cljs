@@ -4,28 +4,15 @@
     [ctmx-electron.service.map :as map]
     [ctmx-electron.service.process :as process]
     [ctmx-electron.service.minecraft-dir :as minecraft-dir]
+    [ctmx-electron.ui.new-dialog :as new-dialog]
     [ctmx-electron.util :as util])
   (:require-macros
     [ctmx.core :as ctmx]))
 
-(def modal
-  (list
-    [:div#modal-backdrop.modal-backdrop.fade {:style "display:block"}]
-    [:div#modal.modal.fade {:tabindex -1 :style "display:block"}
-     [:div.modal-dialog.modal-dialog-centered
-      [:div.modal-content
-       [:div.modal-header
-        [:h5.modal-title "New Chunkmap"]]
-       [:form.modal-body {:hx-post "chunkmaps"}
-        [:label.mr-2 "Game Name"]
-        [:input {:type "text" :name "new-game" :required true}][:br]
-        [:button.btn.btn-primary.mr-2.mt-2 "Ok"]
-        [:button.btn.btn-primary.mr-2.mt-2
-         {:hx-get "chunkmaps"}
-         "Cancel"]]]]]))
-
-(ctmx/defcomponent ^:endpoint chunkmaps [req new-game save]
+(ctmx/defcomponent ^:endpoint chunkmaps [req new-game save ^boolean cancel]
   (ctmx/with-req req
+    (when cancel
+      (set! js/newLocation nil))
     (when delete?
       (if save
         (minecraft-dir/delete! save)
@@ -38,7 +25,7 @@
                 "Double click map to create a new chunkmap, or select one of the existing maps below.")]
       (if (and post? top-level?)
         (do
-          (process/new-game (or new-game save))
+          (process/new-game (or new-game save) params)
           [:h2.text-center {:id id :hx-target "this"}
            "Building " (or save new-game) "..."
            [:button.btn.btn-primary.ml-2
@@ -51,7 +38,7 @@
           {:_ "on htmx:afterOnLoad wait 10ms then add .show to #modal then add .show to #modal-backdrop"
            :hx-patch "chunkmaps"}]
          (when (and patch? top-level?)
-           modal)
+           new-dialog/modal)
          (for [save saves]
            [:div.row
             [:div.col-2

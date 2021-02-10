@@ -41,7 +41,7 @@
 
 (def process)
 
-(defn new-game [game]
+(defn new-game [game params]
   (let [{:strs [lat lng]} (js->clj js/newLocation)]
     (set! process
           (.spawn child_process
@@ -50,6 +50,9 @@
                     (concat
                       ["-jar" "chunkmapper-0.2.jar"
                        "name" (minecraft-dir/game-dir game)]
+                      (mapcat
+                        #(update % 0 name)
+                        (dissoc params :new-game))
                       (when lat
                         ["lat" lat
                          "lng" lng])))))
