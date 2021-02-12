@@ -9,7 +9,11 @@
   (:require-macros
     [ctmx.core :as ctmx]))
 
-(ctmx/defcomponent ^:endpoint chunkmaps [req new-game save ^boolean cancel]
+(ctmx/defcomponent ^:endpoint chunkmaps [req
+                                         new-game
+                                         save
+                                         ^boolean cancel
+                                         cheats]
   (ctmx/with-req req
     (when cancel
       (set! js/newLocation nil))
@@ -22,14 +26,20 @@
     (let [saves (minecraft-dir/saves)
           msg (if (empty? saves)
                 "Double click map to create a new chunkmap."
-                "Double click map to create a new chunkmap, or select one of the existing maps below.")]
-      (if (and post? top-level?)
-        (do
-          (process/new-game (or new-game save) params)
-          [:h2.text-center {:id id :hx-target "this"}
-           "Building " (or save new-game) "..."
-           [:button.btn.btn-primary.ml-2
-            {:hx-delete "chunkmaps"} "Cancel"]])
+                "Double click map to create a new chunkmap, or select one of the existing maps below.")
+          game-exists? (some #(= new-game %) saves)
+          start-process? (and post? top-level? (not game-exists?))
+          cheats (if (and patch? top-level?)
+                   true
+                   cheats)
+          req (update req :params merge {:game-exists? game-exists? :cheats cheats})]
+      (when start-process?
+        (process/new-game (or new-game save) params))
+      (if start-process?
+        [:h2.text-center {:id id :hx-target "this"}
+         "Building " (or save new-game) "..."
+         [:button.btn.btn-primary.ml-2
+          {:hx-delete "chunkmaps"} "Cancel"]]
         [:div.p-2 {:id id :hx-target "this" :style "border: 1px solid black"}
          [:h4 "Chunkmaps"]
          [:p msg
@@ -37,8 +47,8 @@
          [:div#modal-btn.d-none
           {:_ "on htmx:afterOnLoad wait 10ms then add .show to #modal then add .show to #modal-backdrop"
            :hx-patch "chunkmaps"}]
-         (when (and patch? top-level?)
-           new-dialog/modal)
+         (when (or (and patch? top-level?) game-exists?)
+           (new-dialog/modal req))
          (for [save saves]
            [:div.row
             [:div.col-2

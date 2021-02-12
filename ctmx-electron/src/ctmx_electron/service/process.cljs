@@ -34,10 +34,12 @@
 
 (defn log [s]
   (let [s (-> s str .trim)]
-    (->> (.split s "logback:")
-         (filter not-empty)
-         (map logback-json)
-         dorun)))
+    (if (.includes s "logback:")
+      (->> (.split s "logback:")
+           (filter not-empty)
+           (map logback-json)
+           dorun)
+      (println s))))
 
 (def process)
 
