@@ -51,10 +51,11 @@
                   (clj->js
                     (concat
                       ["-jar" "chunkmapper-0.2.jar"
-                       "name" (minecraft-dir/game-dir game)]
+                       "name" (minecraft-dir/game-dir game)
+                       "cheats" (if (-> params :cheats nil?) "false" "true")]
                       (mapcat
                         #(update % 0 name)
-                        (dissoc params :new-game))
+                        (dissoc params :new-game :cheats))
                       (when lat
                         ["lat" lat
                          "lng" lng])))))

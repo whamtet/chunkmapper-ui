@@ -22,7 +22,7 @@
   (reset! red-regions {})
   (reset! blue-regions ())
   (set! js/newLocation nil)
-  (when js/steve
+  (when js/window.steve
     (js/steve.remove)
     (set! js/steve nil)
     (set! js/added false)))
