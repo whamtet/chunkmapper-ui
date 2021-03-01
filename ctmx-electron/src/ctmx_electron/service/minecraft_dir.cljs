@@ -4,7 +4,8 @@
     [ctmx-electron.service.storage :as storage]
     [ctmx-electron.util :as util])
   (:require-macros
-    [ctmx-electron.util :refer [requires]]))
+    [ctmx-electron.util :refer [requires]])
+  (:refer-clojure :exclude [exists?]))
 
 (requires "fs" "os")
 

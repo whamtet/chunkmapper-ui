@@ -42,6 +42,7 @@
       (println s))))
 
 (def process)
+(def opts (if js/process.env.APP_DEV #js {} #js {:cwd js/process.resourcesPath}))
 
 (defn new-game [game params]
   (let [{:strs [lat lng]} (js->clj js/newLocation)]
@@ -58,7 +59,8 @@
                         (dissoc params :new-game :cheats))
                       (when lat
                         ["lat" lat
-                         "lng" lng])))))
+                         "lng" lng])))
+                  opts))
     (set! js/window.p process)
     (doto process
       (-> .-stdout (.on "data" log))
