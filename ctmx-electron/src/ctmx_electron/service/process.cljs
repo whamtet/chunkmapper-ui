@@ -44,7 +44,9 @@
   (-> s str js/console.error))
 
 (def process)
-(def opts (if js/process.env.APP_DEV #js {} #js {:cwd js/process.resourcesPath}))
+(def opts (if js/process.env.APP_DEV
+            #js {}
+            #js {:cwd (str js/process.resourcesPath util/file-separator "app")}))
 
 (defn new-game [game params]
   (let [{:strs [lat lng]} (js->clj js/newLocation)]
