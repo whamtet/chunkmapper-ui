@@ -15,7 +15,7 @@
   (str home-dir
        (cond
          util/osx? "/Library/Application Support/minecraft"
-         util/windows? "/AppData/.minecraft"
+         util/windows? "\\AppData\\.minecraft"
          util/linux? "/.minecraft")))
 
 (defn dir []
@@ -35,9 +35,9 @@
         (.-files $)
         (aget $ 0)
         (.-path $)
-        (.split $ "/")
+        (.split $ util/file-separator)
         (butlast $)
-        (string/join "/" $)
+        (string/join util/file-separator $)
         (storage/set-minecraft-dir $)))
 
 (defn game-dir [f]

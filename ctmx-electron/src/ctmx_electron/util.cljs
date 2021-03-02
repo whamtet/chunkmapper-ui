@@ -11,3 +11,6 @@
 
 (defn from-json [s]
   (-> s js/JSON.parse js->clj walk/keywordize-keys))
+
+(def file-separator
+  (if windows? "\\" "/"))

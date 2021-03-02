@@ -40,6 +40,8 @@
            (map logback-json)
            dorun)
       (println s))))
+(defn err [s]
+  (-> s str js/console.error))
 
 (def process)
 (def opts (if js/process.env.APP_DEV #js {} #js {:cwd js/process.resourcesPath}))
@@ -61,10 +63,16 @@
                         ["lat" lat
                          "lng" lng])))
                   opts))
-    (set! js/window.p process)
     (doto process
       (-> .-stdout (.on "data" log))
-      (-> .-stderr (.on "data" #(-> % str js/console.error))))))
+      (-> .-stderr (.on "data" err)))))
+
+(defn launch [p args]
+  (doto
+    (.spawn child_process p args opts)
+    (-> .-stdout (.on "data" log))
+    (-> .-stderr (.on "data" err))))
+(set! js/window.l launch)
 
 (defn kill! []
   (when process
