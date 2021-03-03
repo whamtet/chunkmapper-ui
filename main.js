@@ -3,9 +3,11 @@ const {app, BrowserWindow} = require('electron')
 const path = require('path')
 const isDev = require('electron-is-dev')
 
+let mainWindow;
+
 function createWindow () {
   // Create the browser window.
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     show: false,
     webPreferences: {
       nodeIntegration: true
@@ -43,6 +45,8 @@ app.whenReady().then(() => {
 app.on('window-all-closed', function () {
   if (process.platform !== 'darwin') app.quit()
 })
+
+app.on('before-quit', () => mainWindow.webContents.executeJavaScript('ctmx_electron.service.process.kill_BANG_()'));
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
