@@ -12,11 +12,10 @@
 (def home-dir (.homedir os))
 
 (def default-dir
-  (str home-dir
-       (cond
-         util/osx? "/Library/Application Support/minecraft"
-         util/windows? "\\AppData\\.minecraft"
-         util/linux? "/.minecraft")))
+  (cond
+    util/osx? (str home-dir "/Library/Application Support/minecraft")
+    util/windows? (str js/process.env.APPDATA "\\.minecraft")
+    util/linux? (str home-dir "/.minecraft")))
 
 (defn dir []
   (if (.existsSync fs default-dir)
@@ -41,14 +40,16 @@
         (storage/set-minecraft-dir $)))
 
 (defn game-dir [f]
-  (str (dir) "/saves/" f))
+  (str (dir) util/file-separator "saves" util/file-separator f))
 
 (defn chunkmapper? [f]
-  (.existsSync fs (str (game-dir f) "/chunkmapper")))
+  (.existsSync fs (str (game-dir f) util/file-separator "chunkmapper")))
 
 (defn saves []
-  (as-> (str (dir) "/saves") $
-        (.readdirSync fs $ #js {:withFileTypes true})
+  (as-> (str (dir) util/file-separator "saves") $
+        (if (.existsSync fs $)
+          (.readdirSync fs $ #js {:withFileTypes true})
+          ())
         (filter #(.isDirectory %) $)
         (map #(.-name %) $)
         (filter chunkmapper? $)))
